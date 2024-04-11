@@ -26,6 +26,119 @@ static const char *TAG = "sd_card";
 #define PIN_NUM_CLK   18
 #define PIN_NUM_CS    5
 
+static void uart_ini()
+{
+    uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_DEFAULT,
+    };
+    // Configure UART parameters
+    ESP_ERROR_CHECK(uart_param_config(UART_NUM_0, &uart_config));
+    ESP_ERROR_CHECK(uart_param_config(UART_NUM_2, &uart_config));
+
+    // Set UART pins
+    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_0, UART_TX_PIN, UART_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_2, UART_TX_PIN_2, UART_RX_PIN_2, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+
+    // Setup UART buffered IO with event queue
+    QueueHandle_t uart_queue;
+    // Install UART driver using an event queue here
+    ESP_ERROR_CHECK(uart_driver_install(UART_NUM_0, BUF_SIZE * 2, \
+                                            BUF_SIZE * 2, 10, &uart_queue, 0));
+
+    ESP_ERROR_CHECK(uart_driver_install(UART_NUM_2, BUF_SIZE * 2, \
+                                            BUF_SIZE * 2, 10, &uart_queue, 0));
+}
+
+static void UART_putchar(uint8_t* data)
+{
+    uart_write_bytes(UART_NUM_0, (const char*) data, 1);
+}
+
+static void UART_puts(char* text)
+{
+    uint8_t* data = (uint8_t *) malloc(2);
+    for(int i = 0; text[i]; i++)
+    {
+        data[0] = text[i];
+        UART_putchar(data);
+    }
+}
+
+static void UART2_putchar(uint8_t* data)
+{
+    uart_write_bytes(UART_NUM_2, (const char*) data, 1);
+}
+
+static uint8_t* UART_getchar()
+{
+    uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
+    do
+    {
+        len = uart_read_bytes(UART_NUM_0, data, (BUF_SIZE - 1), 20 / portTICK_PERIOD_MS);        
+    }while(len == 0);
+
+    return data;
+}
+
+static char* UART_gets()
+{
+    int i;
+    uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
+    char *frase = (char *) malloc(BUF_SIZE);
+    for(i = 0; ; i++)
+    {
+        data = UART_getchar();
+        UART_putchar(data);
+
+        if(data[0] == 8)
+        {
+            i-=2;
+        }
+        else
+        {
+            frase[i] = data[0];
+        }
+        
+        if(data[0] == 13) //Salir
+        {
+            frase[i] = '\0';
+            break;
+        }        
+    }
+    
+    lenfrase = i;
+
+    return frase;
+}
+
+static uint8_t* UART2_getchar()
+{
+    uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
+    do
+    {
+        lenP2 = uart_read_bytes(UART_NUM_2, data, 1, 20 / portTICK_PERIOD_MS);        
+    }while(lenP2 == 0);    
+
+    return data;
+}
+
+
+static uint8_t* UART2_gets()
+{
+    uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
+    do
+    {
+        lenP2 = uart_read_bytes(UART_NUM_2, data, (BUF_SIZE - 1), 20 / portTICK_PERIOD_MS);        
+    }while(lenP2 == 0);    
+
+    return data;
+}
+
 static esp_err_t s_example_write_file(const char *path, char *data)
 {
     ESP_LOGI(TAG, "Abriendo archivo %s", path);
