@@ -69,11 +69,6 @@ static void UART_puts(char* text)
     }
 }
 
-static void UART2_putchar(uint8_t* data)
-{
-    uart_write_bytes(UART_NUM_2, (const char*) data, 1);
-}
-
 static uint8_t* UART_getchar()
 {
     uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
@@ -114,29 +109,6 @@ static char* UART_gets()
     lenfrase = i;
 
     return frase;
-}
-
-static uint8_t* UART2_getchar()
-{
-    uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
-    do
-    {
-        lenP2 = uart_read_bytes(UART_NUM_2, data, 1, 20 / portTICK_PERIOD_MS);        
-    }while(lenP2 == 0);    
-
-    return data;
-}
-
-
-static uint8_t* UART2_gets()
-{
-    uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
-    do
-    {
-        lenP2 = uart_read_bytes(UART_NUM_2, data, (BUF_SIZE - 1), 20 / portTICK_PERIOD_MS);        
-    }while(lenP2 == 0);    
-
-    return data;
 }
 
 static esp_err_t s_example_write_file(const char *path, char *data)
