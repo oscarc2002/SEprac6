@@ -7,9 +7,8 @@ uint8_t isCommand;
 
 typedef struct Editor_Buffer_tag
 {
-    char Buff[16][1024];
-    uint8_t ypos;
-    uint16_t xpos;
+    char Buff[16*1024];
+    uint16_t pos;
 
 }Editor_Buffer_t;
 
