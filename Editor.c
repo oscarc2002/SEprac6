@@ -72,7 +72,16 @@ static void comands(MicroSD_t *sd)
     }
     else if(strcmp(Buffer,":s"))
     {
-
+        create_path(sd);
+        ESP_LOGI(TAG, "Abriendo archivo %s", sd->Path);
+        FILE *f = fopen(sd->Path, "w");
+        if (f == NULL) {
+            ESP_LOGE(TAG, "Fallo abrir el archivo para escritura");
+            return ESP_FAIL;
+        }
+        fprintf(f, data);
+        fclose(f);
+        ESP_LOGI(TAG, "Archivo escrito");
     }
     else
     {
