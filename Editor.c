@@ -43,7 +43,8 @@ static void comands(MicroSD_t *sd)
     }
     else if(strcmp(Buffer,":n"))
     {
-
+        UART_gets();
+        strcpy(sd->Name_file, Buffer);
     }
     else if(strcmp(Buffer,":s"))
     {
