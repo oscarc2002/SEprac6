@@ -26,7 +26,14 @@ static void comands(MicroSD_t *sd)
         do
         {
             c = UART_getchar();
-            UART_putchar(c);
+            if(c == 13)
+            {
+                UART_putchar('\n');
+                data.pos = i;
+            }
+            else
+                UART_putchar(c);
+            
             data.Buff[i++] = c;
         }while(c != 27);
     }
