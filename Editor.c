@@ -12,6 +12,8 @@ typedef struct Editor_Buffer_tag
 
 }Editor_Buffer_t;
 
+Editor_Buffer_t data;
+
 static void comands(MicroSD_t *sd)
 {
     UART_gets();
@@ -20,10 +22,12 @@ static void comands(MicroSD_t *sd)
     if(strcmp(Buffer,":u"))
     {
         char c = '\0';
+        uint16_t i = 0;
         do
         {
             c = UART_getchar();
             UART_putchar(c);
+            data.Buff[i++] = c;
         }while(c != 27);
     }
     else if(strcmp(Buffer,":o"))
