@@ -50,6 +50,7 @@ static void comands(MicroSD_t *sd)
             name[i] = UART_getchar();
             UART_putchar(name[i]);
         }while(name[i++] != 27);
+        name[--i] = '\0';
         strcpy(sd->Name_file, name);
     }
     else if(strcmp(Buffer,":s"))
