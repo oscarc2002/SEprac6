@@ -33,9 +33,11 @@ static void comands(MicroSD_t *sd)
             }
             else
                 UART_putchar(c);
-            
+
             data.Buff[i++] = c;
         }while(c != 27);
+
+        data.Buff[--i] = '\0';
     }
     else if(strcmp(Buffer,":o"))
     {
