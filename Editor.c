@@ -20,7 +20,12 @@ static void comands(MicroSD_t *sd)
 
     if(strcmp(Buffer,":u"))
     {
-
+        char c = '\0';
+        do
+        {
+            c = UART_getchar();
+            UART_putchar(c);
+        }while(c != 27);
     }
     else if(strcmp(Buffer,":o"))
     {
