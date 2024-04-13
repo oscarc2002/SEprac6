@@ -51,7 +51,11 @@ static void comands(MicroSD_t *sd)
             UART_putchar(name[i]);
         }while(name[i++] != 27);
         name[--i] = '\0';
-        strcpy(sd->Name_file, name);
+
+        if(name[0] == '\0') //If is in blank
+            strcpy(sd->Name_file, "default.txt");
+        else
+            strcpy(sd->Name_file, name);
     }
     else if(strcmp(Buffer,":s"))
     {
