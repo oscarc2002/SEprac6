@@ -96,6 +96,11 @@ static void UART_gets()
     lenfrase = i;
 }
 
+void clrscr(void)
+{
+	UART_puts("\033[2J"); //Comando para limpiar el puerto
+}
+
 static void echo_task(void *arg)
 {
     // Configure a temporary buffer for the incoming data
