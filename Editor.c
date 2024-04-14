@@ -14,6 +14,7 @@ typedef struct Editor_Buffer_tag
 
 Editor_Buffer_t data;
 uint16_t i;
+char name[32] = {0};
 
 static void comands(MicroSD_t *sd)
 {
@@ -56,22 +57,22 @@ static void comands(MicroSD_t *sd)
     }
     else if(strcmp(Buffer,":n"))
     {
-        char name[32] = {0};
-        uint8_t i = 0;
+        uint8_t j = 0;
         do
         {
-            name[i] = UART_getchar();
-            UART_putchar(name[i]);
-        }while(name[i++] != 27);
-        name[--i] = '\0';
-
+            name[j] = UART_getchar();
+            UART_putchar(name[j]);
+        }while(name[j++] != 27);
+        name[--j] = '\0';
+    }
+    else if(strcmp(Buffer,":s"))
+    {
+        //Check if it has a name
         if(name[0] == '\0') //If is in blank
             strcpy(sd->Name_file, "default.txt");
         else
             strcpy(sd->Name_file, name);
-    }
-    else if(strcmp(Buffer,":s"))
-    {
+        
         create_path(sd);
         ESP_LOGI(TAG, "Abriendo archivo %s", sd->Path);
         FILE *f = fopen(sd->Path, "w");
