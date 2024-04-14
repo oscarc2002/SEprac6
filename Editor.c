@@ -50,6 +50,7 @@ static void comands(MicroSD_t *sd)
         
         strcpy(Buffer, sd->Name_file);
         create_path(sd);
+        clrscr(); //Clean screen
         ret = s_example_read_file(sd->Path, data.Buff);
         if (ret != ESP_OK) {
             return;
