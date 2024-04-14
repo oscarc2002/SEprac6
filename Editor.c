@@ -101,6 +101,21 @@ static void comands(MicroSD_t *sd)
 static void edit()
 {
     gotoxy(0,0);
+    char c = '\0';
+    i = 0;
+    do
+    {
+        c = UART_getchar();
+        if(c == 13) //obsolete
+        {
+            UART_putchar('\n');
+            data.pos = i;
+        }
+        else
+            UART_putchar(c);
+
+        data.Buff[i++] = c;
+    }while(c != 27);
 }
 
 void create_path(MicroSD_t *sd)
