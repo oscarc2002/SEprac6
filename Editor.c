@@ -30,13 +30,7 @@ static void comands(MicroSD_t *sd)
             do
             {
                 c = UART_getchar();
-                if(c == 13)
-                {
-                    UART_putchar('\n');
-                    data.pos = i;
-                }
-                else
-                    UART_putchar(c);
+                UART_putchar(c);
     
                 data.Buff[i++] = c;
             }while(c != 27);
@@ -106,13 +100,9 @@ static void edit()
     do
     {
         c = UART_getchar();
-        if(c == 13) //obsolete
-        {
-            UART_putchar('\n');
-            data.pos = i;
-        }
-        else
-            UART_putchar(c);
+        UART_putchar(c);
+
+        //Backspace,derecha,izquierda
 
         data.Buff[i++] = c;
     }while(c != 27);
