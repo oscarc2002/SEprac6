@@ -87,7 +87,7 @@ static esp_err_t s_example_write_file(const char *path, char *data)
     return ESP_OK;
 }
 
-static esp_err_t s_example_read_file(const char *path)
+static esp_err_t s_example_read_file(const char *path, char line[EXAMPLE_MAX_CHAR_SIZE])
 {
     ESP_LOGI(TAG, "Abriendo archivo %s", path);
     FILE *file = fopen(path, "r");
@@ -95,9 +95,8 @@ static esp_err_t s_example_read_file(const char *path)
         ESP_LOGE(TAG, "Fallo abrir el archivo para lectura");
         return ESP_FAIL;
     }
-    char line[EXAMPLE_MAX_CHAR_SIZE];
+    //char line[EXAMPLE_MAX_CHAR_SIZE];
     fgets(line, sizeof(line), file);
-    
 
     // strip newline
     char *pos = strchr(line, '\n');
