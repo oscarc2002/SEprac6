@@ -18,22 +18,9 @@ void app_main(void)
 
     //esp_err_t ret;
     // Use POSIX and C standard library functions to work with files.
-
-    comands(&micro);
-
     while(1)
     {
-        char c = UART_getchar();
-
-        if(c == 27)
-        {
-            isCommand = 1;
-        }
-        
-        if(isCommand)
-            comands(&micro);
-        else
-            edit();
+        comands(&micro);
     }
     
 }
