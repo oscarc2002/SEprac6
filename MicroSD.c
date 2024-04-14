@@ -87,7 +87,7 @@ static esp_err_t s_example_write_file(const char *path, char *data)
     return ESP_OK;
 }
 
-static esp_err_t s_example_read_file(const char *path, char *line)
+static esp_err_t s_example_read_file(const char *path, char line[EXAMPLE_MAX_SIZE])
 {
     ESP_LOGI(TAG, "Abriendo archivo %s", path);
     FILE *file = fopen(path, "r");
