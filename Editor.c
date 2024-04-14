@@ -43,10 +43,14 @@ static void comands(MicroSD_t *sd)
     }
     else if(strcmp(Buffer,":o"))
     {
-        UART_gets();
+        do
+        {
+            UART_gets();
+        }while(Buffer[0] == '\0');
+        
         strcpy(Buffer, sd->Name_file);
         create_path(sd);
-        ret = s_example_read_file(sd->Path);
+        ret = s_example_read_file(sd->Path, data.Buff);
         if (ret != ESP_OK) {
             return;
         }
