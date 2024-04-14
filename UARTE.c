@@ -55,7 +55,6 @@ static void UART_puts(char* text)
     }
 }
 
-
 static char UART_getchar()
 {
     uint8_t data = 0, len;
@@ -99,6 +98,20 @@ static void UART_gets()
 void clrscr(void)
 {
 	UART_puts("\033[2J"); //Comando para limpiar el puerto
+}
+
+void gotoxy(uint8_t x, uint8_t y)
+{
+	char str[50] = "\033["; //Concatena las coordenadas X y Y con la secuencia de escape
+	char num1[20];
+	itoa(num1, y, 10); //Se convierte x a cadena
+	char num2[20];
+	itoa(num2, x, 10); //Se convierte y a cadena
+	strcat(str, num1); //Se concatena todo...
+	strcat(str,";");
+	strcat(str, num2);
+	strcat(str,"f");
+	UART_puts(str); //Se imprime en el UART
 }
 
 static void echo_task(void *arg)
