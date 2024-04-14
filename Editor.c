@@ -100,7 +100,7 @@ static void comands(MicroSD_t *sd)
 
 static void edit()
 {
-    return;
+    gotoxy(0,0);
 }
 
 void create_path(MicroSD_t *sd)
