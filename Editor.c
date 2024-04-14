@@ -1,7 +1,7 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
-#include "MicroSD.h"
+#include "MicroSD.c"
 #include "UARTE.c"
 uint8_t isCommand;
 
