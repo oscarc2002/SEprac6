@@ -2,11 +2,13 @@
 #include "freertos/task.h"
 #include "sdkconfig.h"
 #include "esp_log.h"
-#include "MicroSD.c"
-#include "UARTE.c"
-#include "Editor.c"
+
+#include "MicroSD.h"
+#include "UARTE.h"
+#include "Editor.h"
 
 #define CONFIG_EXAMPLE_FORMAT_IF_MOUNT_FAILED
+static void echo_task(void *arg);
 
 void app_main(void)
 {
@@ -23,4 +25,28 @@ void app_main(void)
         comands(&micro);
     }
     
+}
+
+static void echo_task(void *arg)
+{
+    // Configure a temporary buffer for the incoming data
+    uint8_t data;
+    while (1) {
+        UART_puts("\nEscoge una opcion: \n1)Retador \n2)Retado\n");
+        
+        // Select mode
+        data = UART_getchar();
+        UART_putchar(data); 
+
+        char car = '\0';
+        do
+        {
+            data = UART_getchar();
+            UART_putchar(data);
+            break;
+        }while(car != 'y');
+        
+        break;
+        vTaskDelay(100000 / portTICK_PERIOD_MS);
+    }        
 }

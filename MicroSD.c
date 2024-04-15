@@ -1,7 +1,9 @@
 #include "MicroSD.h"
 #include "string.h"
+const char *TAG = "sd_card";
+const char *mount_point = MOUNT_POINT;
 
-static esp_err_t s_init_card(sdmmc_card_t *card)
+esp_err_t s_init_card(sdmmc_card_t *card)
 {
     esp_err_t ret;
 
@@ -72,7 +74,7 @@ static esp_err_t s_init_card(sdmmc_card_t *card)
     return ESP_OK;
 }
 
-static esp_err_t s_example_write_file(const char *path, char *data)
+esp_err_t s_example_write_file(const char *path, char *data)
 {
     ESP_LOGI(TAG, "Abriendo archivo %s", path);
     FILE *f = fopen(path, "w");
@@ -87,7 +89,7 @@ static esp_err_t s_example_write_file(const char *path, char *data)
     return ESP_OK;
 }
 
-static esp_err_t s_example_read_file(const char *path, char line[EXAMPLE_MAX_SIZE])
+esp_err_t s_example_read_file(const char *path)
 {
     ESP_LOGI(TAG, "Abriendo archivo %s", path);
     FILE *file = fopen(path, "r");
@@ -95,27 +97,32 @@ static esp_err_t s_example_read_file(const char *path, char line[EXAMPLE_MAX_SIZ
         ESP_LOGE(TAG, "Fallo abrir el archivo para lectura");
         return ESP_FAIL;
     }
-    //char line[EXAMPLE_MAX_CHAR_SIZE];
+    char line[EXAMPLE_MAX_CHAR_SIZE];
     fgets(line, sizeof(line), file);
+    
+    while(feof(file))
+    {
+        fgets(line, sizeof(line), file);
+
+        ESP_LOGI(TAG, "Lectura de archivo: '%s'", line);
+    }
 
     // strip newline
     char *pos = strchr(line, '\n');
     if (pos) {
         *pos = '\0';
     }
-    ESP_LOGI(TAG, "Lectura de archivo: '%s'", line);
+    //ESP_LOGI(TAG, "Lectura de archivo: '%s'", line);
     fclose(file);
     return ESP_OK;
 }
 
-
-
-void MICROSD_nowarning()
+void init_MicroSD(MicroSD_t *micro)
 {
-    char a = 0;
-    char b[] = "algo";
-    sdmmc_card_t c;
-    s_example_read_file((const char *) b);
-    s_example_write_file((const char *) b, &a);
-    s_init_card(&c);
+    memset(micro->Name_file, 0, sizeof(micro->Name_file));
+    memset(micro->Path, 0, sizeof(micro->Path));
+    strcpy(micro->Mount_Point, mount_point);
+    ESP_LOGI(TAG, "init");
+    s_init_card(micro->card);
+
 }
