@@ -52,9 +52,19 @@ static void comands(MicroSD_t *sd)
                 return;
             }
         }
-        else if(strcmp(Buffer,":e"))
+        else if(strcmp(Buffer,":e")) //UNFINISHED
         {
-            
+            char c = '\0';
+            i = 0;
+            gotoxy(0,0);
+            do
+            {
+                c = UART_getchar();
+                UART_putchar(c);
+    
+                
+            }while(c != 27);
+    
         }
         else if(strcmp(Buffer,":n"))
         {
