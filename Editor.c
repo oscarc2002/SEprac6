@@ -1,8 +1,7 @@
 #include "Editor.h"
 
-uint8_t isCommand;
-Editor_Buffer_t data;
-uint16_t i;
+uint8_t isCommand = 0;
+Editor_Buffer_t data = {0};
 
 void comands(MicroSD_t *sd)
 {
@@ -13,23 +12,32 @@ void comands(MicroSD_t *sd)
     
         if(strcmp(Buffer,":u"))
         {
-            char c = '\0';
-            i = 0;
+            char c = '\n';
+            data.i = 0;
+            data.lastnl = 0;
+
             do
             {
+
                 c = UART_getchar();
                 UART_putchar(c);
-    
-                data.Buff[i++] = c;
+                
+                if(c == '\n')
+                {
+                    data.lastnl = data.i;
+                }
+                
+                data.Buff[data.i++] = c;
+                
             }while(c != 27);
     
-            data.Buff[--i] = '\0';
+            data.Buff[--data.i] = '\0';
         }
         else if(strcmp(Buffer,":o"))
         {
             
-            UART_gets();
-            
+              UART_gets();
+          
             strcpy(sd->Name_file, Buffer);
             create_path(sd);
             clrscr(); //Clean screen
@@ -41,7 +49,7 @@ void comands(MicroSD_t *sd)
         else if(strcmp(Buffer,":e")) //UNFINISHED
         {
             char c = '\0';
-            i = 0;
+            data.i = 0;
             gotoxy(0,0);
             do
             {
@@ -77,15 +85,18 @@ void edit()
 {
     gotoxy(0,0);
     char c = '\0';
-    i = 0;
+    data.i = 0;
     do
     {
         c = UART_getchar();
         UART_putchar(c);
 
-        //Backspace,derecha,izquierda
+        if(c == 3)
+        {
 
-        data.Buff[i++] = c;
+        }
+
+        data.Buff[data.i++] = c;
     }while(c != 27);
 }
 

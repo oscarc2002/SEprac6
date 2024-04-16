@@ -3,50 +3,54 @@
 #include "sdkconfig.h"
 #include "esp_log.h"
 
-#include "MicroSD.h"
 #include "UARTE.h"
 #include "Editor.h"
+#include "MicroSD.h"
 
 #define CONFIG_EXAMPLE_FORMAT_IF_MOUNT_FAILED
-static void echo_task(void *arg);
 
 void app_main(void)
 {
     MicroSD_t micro;
-    sdmmc_card_t *card = NULL;
-    s_init_card(card);
     uart_ini();
-    xTaskCreate(echo_task, "uart_echo_task", 2048, NULL, 10, NULL);
-
-    //esp_err_t ret;
-    // Use POSIX and C standard library functions to work with files.
-    while(1)
+    s_init_card();
+    init_MicroSD(&micro);
+    ESP_LOGI("Murio", "MURio");
+    char c;
+    char data[2];
+    while(1){
+        c = UART_getchar();
+        if(c >= 32)
+        {
+            UART_putchar(c);
+        }
+        
+        if(c == 27)
+        {
+            uart_read_bytes(UART_NUM_0, (void *)data, 2, 20 / portTICK_PERIOD_MS);
+            if(!strcmp("D", data))
+            {
+                UART_puts("\033[D");
+            }
+            memset(data, 0, 2);
+        }
+    }
+    /*
+    strcpy("hellow", micro.Name_file);
+    ESP_LOGI("Murio", "MURio");
+    create_path(&micro);
+    ESP_LOGI("Murio", "MURio");
+    char str[] = "Frase ";
+    for (uint8_t i = 0; i < 5; i++)
     {
-        comands(&micro);
+        str[6] = i + 48;
+        s_example_write_file(micro.Path, str);
+    }
+
+    s_example_read_file(micro.Path);
+    */while (1)
+    {
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     
-}
-
-static void echo_task(void *arg)
-{
-    // Configure a temporary buffer for the incoming data
-    uint8_t data;
-    while (1) {
-        UART_puts("\nEscoge una opcion: \n1)Retador \n2)Retado\n");
-        
-        // Select mode
-        data = UART_getchar();
-        UART_putchar(data); 
-
-        char car = '\0';
-        do
-        {
-            data = UART_getchar();
-            UART_putchar(data);
-            break;
-        }while(car != 'y');
-        
-        break;
-        vTaskDelay(100000 / portTICK_PERIOD_MS);
-    }        
 }

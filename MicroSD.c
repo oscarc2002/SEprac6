@@ -1,12 +1,12 @@
 #include "MicroSD.h"
-#include "string.h"
 const char *TAG = "sd_card";
+
 const char *mount_point = MOUNT_POINT;
 
-esp_err_t s_init_card(sdmmc_card_t *card)
+esp_err_t s_init_card()
 {
     esp_err_t ret;
-
+    sdmmc_card_t *card = NULL;
     /*  Options for mounting the filesystem.
         If format_if_mount_failed is set to true, SD card will be partitioned and
         formatted in case when mounting fails.*/
@@ -29,8 +29,9 @@ esp_err_t s_init_card(sdmmc_card_t *card)
         Example: for fixed frequency of 10MHz, use host.max_freq_khz = 10000;*/
     
     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
-    host.max_freq_khz = 5000;
+    host.max_freq_khz = 400;
     host.slot = SPI3_HOST;
+
     spi_bus_config_t bus_cfg = {
         .mosi_io_num = PIN_NUM_MOSI,
         .miso_io_num = PIN_NUM_MISO,
@@ -123,6 +124,6 @@ void init_MicroSD(MicroSD_t *micro)
     memset(micro->Path, 0, sizeof(micro->Path));
     strcpy(micro->Mount_Point, mount_point);
     ESP_LOGI(TAG, "init");
-    s_init_card(micro->card);
+    //s_init_card(micro->card);
 
 }

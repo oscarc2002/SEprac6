@@ -1,5 +1,7 @@
 #include "UARTE.h"
 
+#include "Editor.h"
+
 char Buffer[1024];
 uint16_t lenfrase;
 
@@ -74,7 +76,14 @@ void UART_gets()
         {
             Buffer[i] = '\0';
             break;
-        }        
+        }
+        if(isCommand == 2)
+        {
+            if(data == 'D' || data == 'C')
+            {
+                break;
+            }
+        }  
     }
     
     lenfrase = i;
@@ -87,14 +96,14 @@ void clrscr(void)
 
 void gotoxy(uint8_t x, uint8_t y)
 {
-	char str[50] = "\033["; //Concatena las coordenadas X y Y con la secuencia de escape
+	char str[] = "\033["; //Concatena las coordenadas X y Y con la secuencia de escape
 	char num1[20];
-	itoa(num1, y, 10); //Se convierte x a cadena
+	itoa(y, num1, 10); //Se convierte x a cadena
 	char num2[20];
-	itoa(num2, x, 10); //Se convierte y a cadena
+	itoa(x, num2, 10); //Se convierte y a cadena
+    UART_puts(str);
 	UART_puts(num1); //Se concatena todo...
 	UART_puts(";");
 	UART_puts(num2);
 	UART_puts("f"); //Se imprime en el UART
 }
-

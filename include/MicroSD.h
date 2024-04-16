@@ -39,7 +39,7 @@ esp_err_t s_example_write_file(const char *path, char *data);
 
 esp_err_t s_example_read_file(const char *path);
 
-esp_err_t s_init_card(sdmmc_card_t *card);
+esp_err_t s_init_card();
 
 void init_MicroSD(MicroSD_t *micro);
 
