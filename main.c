@@ -74,6 +74,7 @@ void app_main(void)
                 gotox(data.i);
             }
 //01345
+            back_array(data);
             if(data.i > 1)
                 data.i--;
 
