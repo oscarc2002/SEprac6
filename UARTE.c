@@ -85,6 +85,7 @@ void UART_gets()
 void clrscr(void)
 {
 	UART_puts("\033[2J"); //Comando para limpiar el puerto
+    gotoxy(0, 0);
 }
 
 void gotoxy(uint8_t x, uint8_t y)

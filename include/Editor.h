@@ -23,6 +23,8 @@ void create_path(MicroSD_t *sd);
 
 void init_EditorBuffer(void);
 
-void back_array(Editor_Buffer_t *data);
+void back_array(void);
+
+void front_array(void);
 
 #endif

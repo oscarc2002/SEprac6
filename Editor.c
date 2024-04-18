@@ -83,30 +83,93 @@ void comands(MicroSD_t *sd)
 
 void edit()
 {
-    gotoxy(0,0);
-    char c = '\0';
-    data.i = 0;
     char aux[2] = {0};
+    char c = '\0';
+    uint8_t len = 0, cursor = strlen(&data.Buff[data.lastnl+1]);
+    data.i = data.maxpos;
+    
     do
     {
         c = UART_getchar();
-        
-        if(c > 32)
+ 
+        if(c >= 32)
         {
             UART_putchar(c);
+            if(data.i != data.maxpos)
+            {   
+                front_array();
+                UART_puts(&data.Buff[data.i+1]);
+                gotox(cursor+2);
+            }
+            cursor++;
+            data.Buff[data.i++] = c;
+            data.maxpos++;            
+            data.Buff[data.maxpos] = 0;
+            
+        }
+        if(c == 8)
+        {
+            UART_putchar(8);
+            UART_puts(&data.Buff[data.i]);
 
+            if(data.i == data.maxpos)
+            {
+                UART_putchar(' ');
+                UART_putchar(8);
+                
+            }
+            else
+            {
+                UART_putchar(' ');
+                gotox(cursor);
+            }
+    
+            if(data.i > data.lastnl)
+            {
+                data.i--;
+                cursor--;
+                back_array();
+            }    
+            
+            if(data.maxpos > data.lastnl)
+            {
+                data.maxpos--;
+                data.Buff[data.maxpos] = 0;
+            }    
+            
         }
         if(c == 27)
         {
-            uart_read_bytes(UART_NUM_0, (void *)aux, 2, 20 / portTICK_PERIOD_MS);
-            
-            if(!strcmp("D", aux))
+            len = uart_read_bytes(UART_NUM_0, (void *)aux, 2, 10 / portTICK_PERIOD_MS);
+            if(len > 0)
             {
-                UART_puts("\033[D");
-            }
-            memset(aux, 0, 2);
+                if(!strcmp("D", aux))
+                {
+                    if(data.i > data.lastnl)
+                    {
+                        data.i--;
+                        cursor--;
+                        UART_puts("\033[D");
+                    }
+                }
+                else if(!strcmp("C", aux))
+                {
+                    if(data.i < data.maxpos)
+                    {
+                        data.i++;
+                        cursor++;
+                        UART_puts("\033[C");
+                    }
+                }
+                memset(aux, 0, 2);
+                c = 0;
+            }     
         }
-        data.Buff[data.i++] = c;
+        if(c == 27)
+        {
+            clrscr();
+            UART_puts(data.Buff);
+        }
     }while(c != 27);
 }
 
@@ -126,10 +189,24 @@ void init_EditorBuffer(void)
     *data.Buff = 0;
 }
 
-void back_array(Editor_Buffer_t *data)
+void back_array(void)
 {
-    for(uint16_t i = data->i; i < maxpos; i++)
+    for(uint16_t i = data.i; i <= data.maxpos; i++)
     {
-        data->Buff[i] = data->Buff[i+1];
+        data.Buff[i] = data.Buff[i+1];
+    }
+}
+
+void front_array(void)
+{
+    for(uint16_t i = data.maxpos; i >= data.i; i--)
+    {
+        
+        data.Buff[i+1] = data.Buff[i];
+        
+        if(i == 0)
+        {
+            break;
+        }
     }
 }
