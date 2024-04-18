@@ -32,4 +32,6 @@ void UART_gets();
 void clrscr(void);
 
 void gotoxy(uint8_t x, uint8_t y);
+
+void gotox(uint8_t x);
 #endif

@@ -76,14 +76,7 @@ void UART_gets()
         {
             Buffer[i] = '\0';
             break;
-        }
-        if(isCommand == 2)
-        {
-            if(data == 'D' || data == 'C')
-            {
-                break;
-            }
-        }  
+        } 
     }
     
     lenfrase = i;
@@ -106,4 +99,13 @@ void gotoxy(uint8_t x, uint8_t y)
 	UART_puts(";");
 	UART_puts(num2);
 	UART_puts("f"); //Se imprime en el UART
+}
+
+void gotox(uint8_t x)
+{
+    char num[10];
+    itoa(x, num, 10);
+    UART_puts("\033[");
+    UART_puts(num);
+    UART_putchar('G');
 }

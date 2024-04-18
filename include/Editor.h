@@ -8,6 +8,7 @@ typedef struct Editor_Buffer_tag
     char Buff[16*1024];
     uint16_t lastnl;
     uint16_t i;
+    uint16_t maxpos;
 
 }Editor_Buffer_t;
 
@@ -20,5 +21,6 @@ void edit();
 
 void create_path(MicroSD_t *sd);
 
+void init_EditorBuffer(void);
 
 #endif
