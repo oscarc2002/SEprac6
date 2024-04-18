@@ -125,3 +125,11 @@ void init_EditorBuffer(void)
     data.maxpos = 0;
     *data.Buff = 0;
 }
+
+void back_array(Editor_Buffer_t *data)
+{
+    for(uint16_t i = data->i; i < maxpos; i++)
+    {
+        data->Buff[i] = data->Buff[i+1];
+    }
+}
