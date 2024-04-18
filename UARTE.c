@@ -61,22 +61,25 @@ void UART_gets()
     for(i = 0; ; i++)
     {
         data = UART_getchar();
-        UART_putchar(data);
 
-        if(data == 8)
+
+        if(data >= 32)
         {
-            i-=2;
-        }
-        else
-        {
+            UART_putchar(data);
             Buffer[i] = data;
         }
         
-        if(data == 13 || data == 27) //Salir
+        if(data == 8)
+        {
+            i-=2;
+            UART_puts("\b \b");
+        }
+        
+        if(data == 27) //Salir
         {
             Buffer[i] = '\0';
             break;
-        } 
+        }
     }
     
     lenfrase = i;
@@ -109,4 +112,18 @@ void gotox(uint8_t x)
     UART_puts("\033[");
     UART_puts(num);
     UART_putchar('G');
+}
+
+
+void display_CMDLine(char *line)
+{
+    clear_CMDLine();
+    UART_puts(line);
+}
+
+void clear_CMDLine(void)
+{
+    gotoxy(0, CMDLINE);
+    UART_puts("\033[K");
+    gotoxy(0, CMDLINE);
 }

@@ -7,37 +7,56 @@ void comands(MicroSD_t *sd)
 {
     while(1)
     {
+        clear_CMDLine();
         UART_gets();
         esp_err_t ret;
-    
+
         if(!strcmp(Buffer,":u"))
         {
+            
             char c = '\n';
-            data.i = 0;
-            data.lastnl = 0;
 
+            if(!(isCommand & (1 << 2)))
+            {
+                clrscr();
+                display_CMDLine("-- INSERTAR --");
+                gotoxy(0, 0);
+                init_EditorBuffer();
+                isCommand |= (1 << 2);
+            }
+            else
+            {
+                data.xpos = strlen(&data.Buff[data.lastnl])+1;
+                gotoxy(data.xpos, data.ypos);
+            }
             do
             {
 
                 c = UART_getchar();
-                UART_putchar(c);
-                
-                if(c == '\n')
+
+                if(c >= 32 || c == 13)
                 {
-                    data.lastnl = data.i;
+                    UART_putchar(c);
+                    data.Buff[data.i++] = c;
+                    data.xpos++;
                 }
                 
-                data.Buff[data.i++] = c;
-                
+                if(c == 13)
+                {
+                    data.lastnl = data.i;
+                    data.xpos = 1;
+                    data.ypos++;
+                }
+          
             }while(c != 27);
-    
-            data.Buff[--data.i] = '\0';
+            uart_flush(UART_NUM_0);
+            data.Buff[data.i] = '\0';
+            data.maxpos = data.i;
         }
         else if(!strcmp(Buffer,":o"))
         {
             
-              UART_gets();
-          
+            UART_gets();
             strcpy(sd->Name_file, Buffer);
             create_path(sd);
             clrscr(); //Clean screen
@@ -48,17 +67,8 @@ void comands(MicroSD_t *sd)
         }
         else if(!strcmp(Buffer,":e")) //UNFINISHED
         {
-            char c = '\0';
-            data.i = 0;
-            gotoxy(0,0);
-            do
-            {
-                c = UART_getchar();
-                UART_putchar(c);
-    
-                
-            }while(c != 27);
-    
+            isCommand = 0;
+            break;
         }
         else if(!strcmp(Buffer,":n"))
         {
@@ -67,16 +77,21 @@ void comands(MicroSD_t *sd)
         }
         else if(!strcmp(Buffer,":s"))
         {
+            clrscr();
+            UART_puts(data.Buff);
+            /*
             //Check if it has a name
             if(sd->Name_file[0] == '\0') //If is in blank
                 strcpy(sd->Name_file, "default.txt");
             
             create_path(sd);
-            ret = s_example_write_file(sd->Path, data.Buff);
+            ret = s_example_write_file(sd->Path, data.Buff);*/
         }
         else
         {
-            ESP_LOGI("Error:", "comando no valido");
+            uart_flush(UART_NUM_0);
+            display_CMDLine("-- Comando no valido --");
+            UART_getchar();
         }
     }
 }
@@ -85,9 +100,11 @@ void edit()
 {
     char aux[2] = {0};
     char c = '\0';
-    uint8_t len = 0, cursor = strlen(&data.Buff[data.lastnl+1]);
-    data.i = data.maxpos;
-    
+    uint8_t len = 0;
+
+    display_CMDLine("-- EDICION --");
+    gotoxy(data.xpos, data.ypos);
+
     do
     {
         c = UART_getchar();
@@ -99,42 +116,39 @@ void edit()
             {   
                 front_array();
                 UART_puts(&data.Buff[data.i+1]);
-                gotox(cursor+2);
+                gotox(data.xpos+1);
             }
-            cursor++;
+            data.xpos++;
             data.Buff[data.i++] = c;
-            data.maxpos++;            
-            data.Buff[data.maxpos] = 0;
+            data.Buff[++data.maxpos] = 0;
             
         }
         if(c == 8)
         {
             UART_putchar(8);
             UART_puts(&data.Buff[data.i]);
+            UART_putchar(' ');
 
             if(data.i == data.maxpos)
             {
-                UART_putchar(' ');
                 UART_putchar(8);
                 
             }
             else
             {
-                UART_putchar(' ');
-                gotox(cursor);
+                gotox(data.xpos-1);
             }
     
             if(data.i > data.lastnl)
             {
                 data.i--;
-                cursor--;
+                data.xpos--;
                 back_array();
             }    
             
             if(data.maxpos > data.lastnl)
             {
-                data.maxpos--;
-                data.Buff[data.maxpos] = 0;
+                data.Buff[--data.maxpos] = 0;
             }    
             
         }
@@ -148,7 +162,7 @@ void edit()
                     if(data.i > data.lastnl)
                     {
                         data.i--;
-                        cursor--;
+                        data.xpos--;
                         UART_puts("\033[D");
                     }
                 }
@@ -157,7 +171,7 @@ void edit()
                     if(data.i < data.maxpos)
                     {
                         data.i++;
-                        cursor++;
+                        data.xpos++;
                         UART_puts("\033[C");
                     }
                 }
@@ -165,14 +179,10 @@ void edit()
                 c = 0;
             }     
         }
-        if(c == 27)
-        {
-            clrscr();
-            UART_puts(data.Buff);
-        }
+        
     }while(c != 27);
+    isCommand = 1;
 }
-
 
 void create_path(MicroSD_t *sd)
 {
@@ -187,6 +197,8 @@ void init_EditorBuffer(void)
     data.lastnl = 0;
     data.maxpos = 0;
     *data.Buff = 0;
+    data.xpos = 1;
+    data.ypos = 1;
 }
 
 void back_array(void)

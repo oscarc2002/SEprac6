@@ -34,4 +34,8 @@ void clrscr(void);
 void gotoxy(uint8_t x, uint8_t y);
 
 void gotox(uint8_t x);
+
+void clear_CMDLine(void);
+
+void display_CMDLine(char *line);
 #endif

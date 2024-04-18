@@ -2,6 +2,8 @@
 #define EDITOR_H
 
 #include "MicroSD.h"
+#define CMDLINE 27
+#define NAMEFILE 26
 
 typedef struct Editor_Buffer_tag
 {
@@ -9,7 +11,8 @@ typedef struct Editor_Buffer_tag
     uint16_t lastnl;
     uint16_t i;
     uint16_t maxpos;
-
+    uint8_t xpos;
+    uint8_t ypos;
 }Editor_Buffer_t;
 
 extern Editor_Buffer_t data;

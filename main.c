@@ -11,9 +11,10 @@
 
 void app_main(void)
 {   
+    MicroSD_t micro = {0};
+    isCommand = 0;
+    isCommand = 1;
     /*
-    MicroSD_t micro;
-    
     s_init_card();
     init_MicroSD(&micro);
     ESP_LOGI("Murio", "MURio");
@@ -38,8 +39,7 @@ void app_main(void)
     }*/
 
     uart_ini();
-    init_EditorBuffer();
-    edit();    
+    init_EditorBuffer();  
     /*
     strcpy("hellow", micro.Name_file);
     ESP_LOGI("Murio", "MURio");
@@ -53,8 +53,19 @@ void app_main(void)
     }
 
     s_example_read_file(micro.Path);
-    */while (1)
+    */
+    while (1)
     {
+        switch (isCommand)
+        {
+        case 0:
+            edit();
+            break;
+        
+        default:
+            comands(&micro);
+            break;
+        }
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
