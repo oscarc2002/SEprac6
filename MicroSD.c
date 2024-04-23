@@ -3,10 +3,9 @@ const char *TAG = "sd_card";
 
 const char *mount_point = MOUNT_POINT;
 
-esp_err_t s_init_card()
+esp_err_t s_init_card(sdmmc_card_t *card)
 {
     esp_err_t ret;
-    sdmmc_card_t *card = NULL;
     /*  Options for mounting the filesystem.
         If format_if_mount_failed is set to true, SD card will be partitioned and
         formatted in case when mounting fails.*/
@@ -29,7 +28,7 @@ esp_err_t s_init_card()
         Example: for fixed frequency of 10MHz, use host.max_freq_khz = 10000;*/
     
     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
-    host.max_freq_khz = 400;
+    host.max_freq_khz = 5000;
     host.slot = SPI3_HOST;
 
     spi_bus_config_t bus_cfg = {
@@ -41,7 +40,7 @@ esp_err_t s_init_card()
         .max_transfer_sz = 4000,
     };
     
-    ret = spi_bus_initialize(host.slot, &bus_cfg, SPI_DMA_CH_AUTO);
+    ret = spi_bus_initialize(host.slot, &bus_cfg, SDSPI_DEFAULT_DMA);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Fallo inicializacion del bus.");
         return ESP_FAIL;
@@ -78,13 +77,13 @@ esp_err_t s_init_card()
 esp_err_t s_example_write_file(const char *path, char *data)
 {
     ESP_LOGI(TAG, "Abriendo archivo %s", path);
-    FILE *f = fopen(path, "w");
-    if (f == NULL) {
+    FILE *file = fopen(path, "w");
+    if (file == NULL) {
         ESP_LOGE(TAG, "Fallo abrir el archivo para escritura");
         return ESP_FAIL;
     }
-    fprintf(f, data);
-    fclose(f);
+    fprintf(file, data);
+    fclose(file);
     ESP_LOGI(TAG, "Archivo escrito");
 
     return ESP_OK;
@@ -99,19 +98,12 @@ esp_err_t s_example_read_file(const char *path)
         return ESP_FAIL;
     }
     char line[EXAMPLE_MAX_CHAR_SIZE];
-    fgets(line, sizeof(line), file);
     
-    while(feof(file))
+    while(!feof(file))
     {
         fgets(line, sizeof(line), file);
 
-        ESP_LOGI(TAG, "Lectura de archivo: '%s'", line);
-    }
-
-    // strip newline
-    char *pos = strchr(line, '\n');
-    if (pos) {
-        *pos = '\0';
+        UART_puts(line);
     }
     //ESP_LOGI(TAG, "Lectura de archivo: '%s'", line);
     fclose(file);
@@ -124,6 +116,6 @@ void init_MicroSD(MicroSD_t *micro)
     memset(micro->Path, 0, sizeof(micro->Path));
     strcpy(micro->Mount_Point, mount_point);
     ESP_LOGI(TAG, "init");
-    //s_init_card(micro->card);
+    s_init_card(micro->card);
 
 }

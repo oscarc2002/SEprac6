@@ -29,6 +29,7 @@ void comands(MicroSD_t *sd)
                 data.xpos = strlen(&data.Buff[data.lastnl])+1;
                 gotoxy(data.xpos, data.ypos);
             }
+
             do
             {
 
@@ -36,20 +37,25 @@ void comands(MicroSD_t *sd)
 
                 if(c >= 32 || c == 13)
                 {
-                    UART_putchar(c);
+                    
                     data.Buff[data.i++] = c;
                     data.xpos++;
+
+                    if(c == 13)
+                    {
+                        data.lastnl = data.i;
+                        data.xpos = 1;
+
+                        if (data.ypos < NAMEFILE - 1)
+                            data.ypos++;
+
+                    }
+
+                    UART_putchar(c);
                 }
                 
-                if(c == 13)
-                {
-                    data.lastnl = data.i;
-                    data.xpos = 1;
-                    data.ypos++;
-                }
-          
             }while(c != 27);
-            uart_flush(UART_NUM_0);
+            
             data.Buff[data.i] = '\0';
             data.maxpos = data.i;
         }
@@ -77,15 +83,12 @@ void comands(MicroSD_t *sd)
         }
         else if(!strcmp(Buffer,":s"))
         {
-            clrscr();
-            UART_puts(data.Buff);
-            /*
             //Check if it has a name
             if(sd->Name_file[0] == '\0') //If is in blank
                 strcpy(sd->Name_file, "default.txt");
             
             create_path(sd);
-            ret = s_example_write_file(sd->Path, data.Buff);*/
+            ret = s_example_write_file(sd->Path, data.Buff);
         }
         else
         {
@@ -93,7 +96,9 @@ void comands(MicroSD_t *sd)
             display_CMDLine("-- Comando no valido --");
             UART_getchar();
         }
+        *Buffer = 0;
     }
+    
 }
 
 void edit()
@@ -188,6 +193,7 @@ void create_path(MicroSD_t *sd)
 {
     *sd->Path = 0;
     strcat(sd->Path, sd->Mount_Point);
+    strcat(sd->Path, "/");
     strcat(sd->Path, sd->Name_file);
 }
 

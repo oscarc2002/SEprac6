@@ -11,7 +11,7 @@
 
 void app_main(void)
 {   
-    MicroSD_t micro = {0};
+    MicroSD_t micro;
     isCommand = 0;
     isCommand = 1;
     /*
@@ -37,9 +37,12 @@ void app_main(void)
             memset(data, 0, 2);
         }
     }*/
-
+    UART_puts("\033[1;r");
+    init_MicroSD(&micro);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     uart_ini();
-    init_EditorBuffer();  
+    init_EditorBuffer();
+    UART_puts("\033[1;25r");
     /*
     strcpy("hellow", micro.Name_file);
     ESP_LOGI("Murio", "MURio");
