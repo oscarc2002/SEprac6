@@ -15,11 +15,11 @@ void comands(MicroSD_t *sd)
             
             char c = '\n';
 
-            if(!(isCommand & (1 << 2)))
+            if( !(isCommand & (1 << 1)) )
             {
                 clrscr();
                 init_EditorBuffer();
-                isCommand |= (1 << 2);
+                isCommand |= (1 << 1);
             }
             display_CMDLine("-- INSERTAR --");
             if(*sd->Name_file)
@@ -72,10 +72,11 @@ void comands(MicroSD_t *sd)
             if (ret != ESP_OK) {
                 return;
             }
+            *sd->Name_file = 0;
         }
         else if(!strcmp(Buffer,":e")) //UNFINISHED
         {
-            isCommand = 0;
+            isCommand &= ~(1 << 0);
             break;
         }
         else if(!strcmp(Buffer,":n"))
@@ -83,17 +84,24 @@ void comands(MicroSD_t *sd)
             display_NameFile("Nombre del archivo:");
             get_CMD();
             strcpy(sd->Name_file, Buffer);
+            clear_NameFile(sd->Name_file);
             display_NameFile(sd->Name_file);
             clear_CMDLine();
         }
         else if(!strcmp(Buffer,":s"))
         {
             //Check if it has a name
-            if(sd->Name_file[0] == '\0') //If is in blank
+            if(*sd->Name_file == '\0') //If is in blank
                 strcpy(sd->Name_file, "default.txt");
             
             create_path(sd);
             ret = s_example_write_file(sd->Path, data.Buff);
+            UART_getchar();
+            clrscr();
+            clear_NameFileLine();
+            init_EditorBuffer();
+            *sd->Name_file = 0;
+            isCommand &= ~(1 << 1);
         }
         else
         {
@@ -111,7 +119,11 @@ void edit()
     char aux[2] = {0};
     char c = '\0';
     uint8_t len = 0;
-
+    if(! (isCommand & (1 << 1)) )
+    {
+        clear_NameFile("[Sin nombre]");
+        clrscr();
+    }
     display_CMDLine("-- EDICION --");
     gotoxy(data.xpos, data.ypos);
 
@@ -191,15 +203,29 @@ void edit()
         }
         
     }while(c != 27);
-    isCommand = 1;
+    isCommand |= 1;
 }
 
 void create_path(MicroSD_t *sd)
 {
     *sd->Path = 0;
+    clear_NameFile(sd->Name_file);
     strcat(sd->Path, sd->Mount_Point);
     strcat(sd->Path, "/");
     strcat(sd->Path, sd->Name_file);
+}
+
+void clear_NameFile(char *name)
+{
+
+    while(*name)
+    {
+        if(*name == '/')
+        {
+            *name = '_';
+        }
+        name++;
+    }
 }
 
 void init_EditorBuffer(void)

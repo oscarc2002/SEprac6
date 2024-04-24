@@ -77,7 +77,7 @@ esp_err_t s_init_card(sdmmc_card_t *card)
 esp_err_t s_example_write_file(const char *path, char *data)
 {
     display_NameFile("Guardado en: ");
-    display_NameFile(path);
+    UART_puts((char *)path);
     FILE *file = fopen(path, "w");
     if (file == NULL) {
         display_CMDLine("Fallo abrir el archivo para escritura");
@@ -86,7 +86,7 @@ esp_err_t s_example_write_file(const char *path, char *data)
     }
     fprintf(file, data);
     fclose(file);
-
+    display_CMDLine("Archivo guardado");
     return ESP_OK;
 }
 
@@ -106,7 +106,6 @@ esp_err_t s_example_read_file(const char *path)
 
         UART_puts(line);
     }
-    //ESP_LOGI(TAG, "Lectura de archivo: '%s'", line);
     fclose(file);
     return ESP_OK;
 }

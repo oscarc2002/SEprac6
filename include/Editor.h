@@ -1,6 +1,7 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
+#include<string.h>
 #include "MicroSD.h"
 #define CMDLINE 27
 #define NAMEFILE 26
@@ -25,6 +26,8 @@ void edit();
 void create_path(MicroSD_t *sd);
 
 void init_EditorBuffer(void);
+
+void clear_NameFile(char *name);
 
 void back_array(void);
 

@@ -7,32 +7,33 @@
 #include "Editor.h"
 #include "MicroSD.h"
 
-#define CONFIG_EXAMPLE_FORMAT_IF_MOUNT_FAILED
 
 void app_main(void)
 {   
     MicroSD_t micro;
     isCommand = 1;
+    init_EditorBuffer();
     uart_ini();
     gotoxy(0, 0);
     UART_puts("\033[1;100r");
-    vTaskDelay(100 / portTICK_PERIOD_MS);
-    init_MicroSD(&micro);
-    init_EditorBuffer();
     UART_puts("\033[1;25r");
+    init_MicroSD(&micro);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+
+    getchar();
+    clrscr();
 
     while (1)
     {
-        switch (isCommand)
+        if(!(isCommand & (1 << 0)))
         {
-        case 0:
-            edit();
-            break;
-        
-        default:
+             edit();
+        }   
+        else
+        {
             comands(&micro);
-            break;
         }
+
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
