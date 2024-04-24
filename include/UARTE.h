@@ -17,7 +17,6 @@
 //const char *TAGUART = "MENSAJE";
 
 extern char Buffer[1024];
-extern uint16_t lenfrase;
 
 void uart_ini();
 

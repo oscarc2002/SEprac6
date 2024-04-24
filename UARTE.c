@@ -3,7 +3,6 @@
 #include "Editor.h"
 
 char Buffer[1024];
-uint16_t lenfrase;
 
 void uart_ini()
 {
@@ -68,21 +67,26 @@ void UART_gets()
             UART_putchar(data);
             Buffer[i] = data;
         }
-        
-        if(data == 8)
+        else
         {
-            i-=2;
-            UART_puts("\b \b");
-        }
+
+            switch (data)
+            {
+                case 8:
+                    i-=2;
+                    UART_puts("\b \b");
+                    break;
+                case 27:
+                    Buffer[i] = '\0';
+                    break;
+                
+                default:
+                    i -= 2;
+                    break;
+            }
+        } 
         
-        if(data == 27) //Salir
-        {
-            Buffer[i] = '\0';
-            break;
-        }
     }
-    
-    lenfrase = i;
 }
 
 void clrscr(void)
