@@ -7,8 +7,7 @@ void comands(MicroSD_t *sd)
 {
     while(1)
     {
-        clear_CMDLine();
-        UART_gets();
+        get_CMD();
         esp_err_t ret;
 
         if(!strcmp(Buffer,":u"))
@@ -19,16 +18,17 @@ void comands(MicroSD_t *sd)
             if(!(isCommand & (1 << 2)))
             {
                 clrscr();
-                display_CMDLine("-- INSERTAR --");
-                gotoxy(0, 0);
                 init_EditorBuffer();
                 isCommand |= (1 << 2);
             }
+            display_CMDLine("-- INSERTAR --");
+            if(*sd->Name_file)
+                display_NameFile(sd->Name_file);
             else
-            {
-                data.xpos = strlen(&data.Buff[data.lastnl])+1;
-                gotoxy(data.xpos, data.ypos);
-            }
+                display_NameFile("[Sin nombre]");
+                
+            data.xpos = strlen(&data.Buff[data.lastnl])+1;
+            gotoxy(data.xpos, data.ypos);
 
             do
             {
@@ -61,11 +61,13 @@ void comands(MicroSD_t *sd)
         }
         else if(!strcmp(Buffer,":o"))
         {
-            
-            UART_gets();
+            display_NameFile("Nombre del archivo:");
+            get_CMD();
             strcpy(sd->Name_file, Buffer);
             create_path(sd);
             clrscr(); //Clean screen
+            display_NameFile(sd->Name_file);
+            clear_CMDLine();
             ret = s_example_read_file(sd->Path);
             if (ret != ESP_OK) {
                 return;
@@ -78,8 +80,11 @@ void comands(MicroSD_t *sd)
         }
         else if(!strcmp(Buffer,":n"))
         {
-            UART_gets();
+            display_NameFile("Nombre del archivo:");
+            get_CMD();
             strcpy(sd->Name_file, Buffer);
+            display_NameFile(sd->Name_file);
+            clear_CMDLine();
         }
         else if(!strcmp(Buffer,":s"))
         {

@@ -121,9 +121,28 @@ void display_CMDLine(char *line)
     UART_puts(line);
 }
 
+void display_NameFile(char *line)
+{
+    clear_NameFileLine();
+    UART_puts(line);
+}
+
+void clear_NameFileLine(void)
+{
+    gotoxy(0, NAMEFILE);
+    UART_puts("\033[K");
+    gotoxy(0, NAMEFILE);
+}
+
 void clear_CMDLine(void)
 {
     gotoxy(0, CMDLINE);
     UART_puts("\033[K");
     gotoxy(0, CMDLINE);
+}
+
+void get_CMD()
+{
+    clear_CMDLine();
+    UART_gets();
 }

@@ -37,5 +37,12 @@ void gotox(uint8_t x);
 
 void clear_CMDLine(void);
 
+void clear_NameFileLine(void);
+
 void display_CMDLine(char *line);
+
+void display_NameFile(char *line);
+
+void get_CMD();
+
 #endif
