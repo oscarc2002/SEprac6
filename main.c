@@ -14,14 +14,14 @@ void app_main(void)
     isCommand = 1;
     init_EditorBuffer();
     uart_ini();
+    init_MicroSD(&micro);
     gotoxy(0, 0);
     UART_puts("\033[1;100r");
-    UART_puts("\033[1;25r");
-    init_MicroSD(&micro);
-    vTaskDelay(100 / portTICK_PERIOD_MS);
-
+    UART_puts("\033[1;25r");  
+    vTaskDelay(300 / portTICK_PERIOD_MS);
     getchar();
     clrscr();
+    
 
     while (1)
     {

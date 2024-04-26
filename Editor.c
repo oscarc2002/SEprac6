@@ -105,6 +105,7 @@ void comands(MicroSD_t *sd)
         }
         else
         {
+            vTaskDelay(100 / portTICK_PERIOD_MS);
             uart_flush(UART_NUM_0);
             display_CMDLine("-- Comando no valido --");
             UART_getchar();

@@ -78,6 +78,7 @@ void UART_gets()
                     break;
                 case 27:
                     Buffer[i] = '\0';
+                    return;
                     break;
                 
                 default:
